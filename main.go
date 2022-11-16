@@ -2,14 +2,18 @@ package main
 
 import (
 	"fmt"
-	"reflect"
-	"sort"
+	"sync"
 )
 
 func main() {
-
-	s := sort.IntSlice{}
-	fmt.Println(reflect.TypeOf(s))
-	fmt.Printf("%T\n", s)
-	s = append(s, 5)
+	wg := sync.WaitGroup{}
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func(wg sync.WaitGroup, i int) {
+			fmt.Println(i)
+			wg.Done()
+		}(wg, i)
+	}
+	wg.Wait()
+	fmt.Println("exit")
 }
