@@ -2,18 +2,15 @@ package main
 
 import (
 	"fmt"
-	"sync"
 )
 
+func someAction(v []int8, b int8) {
+	v[0] = 100
+	v = append(v, b)
+}
+
 func main() {
-	wg := sync.WaitGroup{}
-	for i := 0; i < 5; i++ {
-		wg.Add(1)
-		go func(wg sync.WaitGroup, i int) {
-			fmt.Println(i)
-			wg.Done()
-		}(wg, i)
-	}
-	wg.Wait()
-	fmt.Println("exit")
+	var a = []int8{1, 2, 3, 4, 5}
+	someAction(a, 6)
+	fmt.Println(a)
 }
