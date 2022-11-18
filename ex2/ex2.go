@@ -17,7 +17,7 @@ func main() {
 	}
 	time.Sleep(time.Second)
 
-	wg := sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
 	fmt.Println("--------------------SYNC BY SYNC.WAITGROUP--------------------")
 	for _, n := range array {
 		wg.Add(1)
