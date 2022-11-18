@@ -11,25 +11,38 @@ import (
 
 func main() {
 	array := [...]int{2, 4, 6, 8, 10}
-
+	fmt.Println("--------------------BY TIME.SLEEP--------------------")
 	for _, n := range array {
-		go pow(n)
+		go powPrint(n)
 	}
 	time.Sleep(time.Second)
-	fmt.Println("--------------------BY TIME.SLEEP--------------------")
+
 	wg := sync.WaitGroup{}
+	fmt.Println("--------------------SYNC BY SYNC.WAITGROUP--------------------")
 	for _, n := range array {
 		wg.Add(1)
 		go func(n int) {
-			pow(n)
+			powPrint(n)
 			wg.Done()
 		}(n)
 	}
 	wg.Wait()
-	fmt.Println("--------------------SYNC BY SYNC.WAITGROUP--------------------")
+	fmt.Println("--------------------SYNC BY CHANNEL--------------------")
+	//Создаем буффериованный канал с размером массива array
+	ch := make(chan int, len(array))
 
+	for i, n := range array {
+		go func(i, n int, ch chan<- int) {
+			powPrint(n)
+			ch <- i
+		}(i, n, ch)
+	}
+	//Читаем из канала все данные, для завершения работ всех запущенных горутин
+	for i := 0; i < len(array); i++ {
+		<-ch
+	}
 }
 
-func pow(n int) {
-	fmt.Println(n * n)
+func powPrint(n int) {
+	fmt.Printf("Квадрат числа: %d = %d\n", n, n*n)
 }
