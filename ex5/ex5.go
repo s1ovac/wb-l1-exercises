@@ -22,7 +22,7 @@ func main() {
 	}
 }
 
-func send(ch chan<- string, done <-chan bool) {
+func send(ch chan<- string, done chan bool) {
 	for {
 		select {
 		case <-done: // Ждем получения данных для закрытия канала

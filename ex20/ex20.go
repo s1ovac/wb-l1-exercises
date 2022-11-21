@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	var words string = "snow dog sun cat"
+	var words string = "snow dog sun"
 	fmt.Println(ReverseWordsInString(words))
 }
 
