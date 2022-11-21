@@ -44,7 +44,3 @@ func (c *Counter) Value() int64 {
 func (c *Counter) IncViaAtomic() {
 	atomic.AddInt64(&c.c, 1)
 }
-
-func (c *Counter) IncViaChannel() {
-	atomic.AddInt64(&c.c, 1)
-}
