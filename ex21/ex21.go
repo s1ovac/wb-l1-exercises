@@ -1,28 +1,53 @@
 package main
 
+import "fmt"
+
 func main() {
-
+	xml := &XMLDocument{} // Сервис, который работает только с XML
+	client := &Client{}   // Клиент, который прочитает XML файл
+	client.SendXML(xml)
+	json := &JSONDocument{} // Сервис, который работает только с JSON
+	jsonAdapter := &JSONAdaptee{
+		XMLtoJSON: json,
+	}
+	client.SendXML(jsonAdapter) // Теперь наш тип удовлетворяет интерфейсу Sender
 }
 
-type Target interface { // Интерфейс Target, описывающий целевой интерфейс (тот интерфейс с которым наша система хотела бы работать)
-	Request() string
+// Интерфейс сендер отправляет документ в XML формате
+type Sender interface {
+	SendXML()
 }
 
-type Adaptee struct { //тип, который наша система должна адаптировать под себя
+// Сервис, который отправляет данные в XML формате
+type XMLDocument struct {
 }
 
-func (a *Adaptee) SpecificRequest() string {
-	return "Request"
+func (x *XMLDocument) SendXML() {
+	fmt.Println("Send document in XML format")
 }
 
-func NewAdapter(adaptee *Adaptee) Target {
-	return &Adapter{adaptee}
+// Сервис, который отправляет данные в JSON формате
+type JSONDocument struct {
 }
 
-type Adapter struct { // Адаптер реализующий целевой интерфейс
-	*Adaptee
+func (j *JSONDocument) SendJSON() {
+	fmt.Println("Send document in JSON format")
 }
 
-func (a *Adapter) Request() string {
-	return a.SpecificRequest()
+// Адаптер, который переводит xml в json формат
+type JSONAdaptee struct {
+	XMLtoJSON *JSONDocument
+}
+
+func (j *JSONAdaptee) SendXML() {
+	fmt.Println("Converting XML to JSON...")
+	j.XMLtoJSON.SendJSON()
+}
+
+type Client struct {
+}
+
+func (c *Client) SendXML(sender Sender) {
+	fmt.Println("Reading XML format...")
+	sender.SendXML()
 }
