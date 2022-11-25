@@ -3,63 +3,74 @@ package main
 import (
 	"context"
 	"fmt"
-	"runtime"
+	"sync"
 	"time"
 )
 
+// Реализовать все возможные способы остановки выполнения горутины.
 func main() {
-	runtime.Gosched()
-	goroutineStopByChannel()
-	goroutineStopByContext()
+	ctx := context.Background()
+	stopByContext(ctx)
+	stopByChan()
+	stopByWaitGroup()
 }
 
-func goroutineStopByChannel() {
-	done := make(chan bool)
-	// Чтобы сделать goroutine остановливаемой, позволим ей слушать сигнал остановки на канале.
-	go func() { //запускаю горутины
-		for { //в цикле слушаю два канала
-			select {
-			case <-time.Tick(time.Millisecond * 500): //каждую секунду вывожу сообщение
-				fmt.Println("Горутина активна в канале")
-			case <-done: //жду сигнал о завершении от другой горутины
-				return
-			}
-		}
-	}()
-	go func() {
-		time.Sleep(time.Second * 2)
-		done <- true
-		close(done)
-	}()
-
-	fmt.Println("Активных горутин: ", runtime.NumGoroutine())
-	time.Sleep(3 * time.Second) //даю горутинам время на отработку
-
-	fmt.Println("Активных горутин: ", runtime.NumGoroutine())
-	fmt.Println("Горутина остановлена")
-	fmt.Println("Выход программы")
-}
-
-func goroutineStopByContext() {
-	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
-	done := make(chan bool)
-
+func stopByContext(ctx context.Context) {
+	ctx, _ = context.WithTimeout(ctx, time.Second*3)
+	check := make(chan bool)
 	go func() {
 		for {
 			select {
-			case <-time.Tick(500 * time.Millisecond):
-				fmt.Println("Горутина активна в контексте")
+			case <-time.Tick(time.Millisecond * 500):
+				fmt.Println("Goroutine is alive!")
 			case <-ctx.Done():
-				fmt.Println("Горутина остановалена в контексте")
-				done <- true
+				check <- true
+				fmt.Println("Goroutine is dead while context is stopped!")
 				return
 			}
-
 		}
 	}()
-	fmt.Println("Активных горутин: ", runtime.NumGoroutine())
+	<-check
+
+}
+
+func stopByChan() {
+	done := make(chan bool)
+	tm := time.After(time.Second * 3) // Инициализирую таймер, который пошлет сигнал при завершении в канал tm
+	go func() {
+		for {
+			select {
+			case <-time.Tick(time.Millisecond * 500):
+				fmt.Println("Goroutine is alive!")
+			case <-tm:
+				fmt.Println("Closing goroutine")
+				done <- true // Посылаем данные в канал done
+				close(done)  // Закрываем канал done, следовательно закрываем нашу горутину
+			case <-done:
+				fmt.Println("Goroutine is dead while channel is closed")
+				return
+			}
+		}
+	}()
 	<-done
-	fmt.Println("Активных горутин: ", runtime.NumGoroutine())
-	fmt.Println("Горутина остановлена")
-	fmt.Println("Выход программы")
+}
+
+func stopByWaitGroup() {
+	wg := &sync.WaitGroup{}
+	check := make(chan bool)
+	wg.Add(1)
+	go func() {
+		for {
+			foo, ok := <-check
+			if !ok {
+				fmt.Println("Goroutine is dead by WaitGroup")
+				wg.Done()
+				return
+			}
+			fmt.Println(foo)
+		}
+	}()
+	check <- true
+	close(check)
+	wg.Wait()
 }
