@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 
+// Реализовать паттерн «адаптер» на любом примере.
 func main() {
 	xml := &XMLDocument{} // Сервис, который работает только с XML
 	client := &Client{}   // Клиент, который прочитает XML файл

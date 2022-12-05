@@ -5,8 +5,10 @@ import (
 	"strings"
 )
 
+// Разработать программу, которая переворачивает слова в строке.
+// Пример: «snow dog sun — sun dog snow».
 func main() {
-	var words string = "snow dog sun"
+	var words string = "snow dog"
 	fmt.Println(ReverseWordsInString(words))
 }
 

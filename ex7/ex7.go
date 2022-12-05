@@ -2,12 +2,15 @@ package main
 
 import "sync"
 
+// Реализовать конкурентную запись данных в map.
+
 type Counter struct {
-	mu *sync.Mutex
+	mu *sync.Mutex // Используем мьютекс для синхронизации и для предоствращения гонок
 	m  map[int]struct{}
 	mp *sync.Map
 }
 
+// NewCounter - конструктор счетчика
 func NewCounter() *Counter {
 	return &Counter{
 		m:  make(map[int]struct{}),
@@ -33,8 +36,8 @@ func main() {
 
 func (c *Counter) SendValueByMutex(value int) {
 	c.mu.Lock()
-	c.m[value] = struct{}{}
-	c.mu.Unlock() // без defer, так как будет небольшой оверхед
+	c.m[value] = struct{}{} // Пустая структура ничего не весит
+	c.mu.Unlock()           // без defer, так как будет небольшой оверхед
 }
 
 // Обертка стандартной библиотеки на Mutex

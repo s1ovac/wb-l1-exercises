@@ -22,9 +22,9 @@ func main() {
 		wg      = new(sync.WaitGroup)
 		flag    bool
 	)
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background()) // Создаем контекст для работы с горутинами
 	input := make(chan int)
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(time.Second) // Тикер для наглядности работы проги
 	fmt.Print("Введите кол-во воркеров: ")
 	if _, err := fmt.Scan(&workers); err != nil {
 		log.Fatal(err)
@@ -33,14 +33,13 @@ func main() {
 	for i := 0; i < workers; i++ {
 		go work(ctx, wg, input, i)
 	}
-	go shutdown(cancel)
-	wg.Wait()
-
+	go shutdown(cancel) // Запускаем горутину, которая будет ждать получения сигнала из OC, и после вызовет фукнцию cancel
+	wg.Wait()           // Ждем выполнения всех горутин
 	for {
 		select {
 		case <-ticker.C:
 			input <- time.Now().Second()
-		case <-ctx.Done():
+		case <-ctx.Done(): // Ожидаем, когда контекст будет завершен, тогда выйдем из функции
 			flag = true
 			break
 		}
@@ -51,6 +50,7 @@ func main() {
 	}
 }
 
+// work получает данные из канала и выводит их в output
 func work(ctx context.Context, wg *sync.WaitGroup, input chan int, i int) {
 	wg.Add(1)
 	defer wg.Done()

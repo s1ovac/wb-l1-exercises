@@ -9,8 +9,7 @@ import (
 
 // Реализовать все возможные способы остановки выполнения горутины.
 func main() {
-	ctx := context.Background()
-	stopByContext(ctx)
+	stopByContext(context.Background())
 	stopByChan()
 	stopByWaitGroup()
 }
@@ -21,9 +20,9 @@ func stopByContext(ctx context.Context) {
 	go func() {
 		for {
 			select {
-			case <-time.Tick(time.Millisecond * 500):
+			case <-time.Tick(time.Millisecond * 500): // Посылает сигнал в канал каждые 500 мс и сообщает, что горутина жива
 				fmt.Println("Goroutine is alive!")
-			case <-ctx.Done():
+			case <-ctx.Done(): // ожидаем получения данных в канал по истечению срока 3 с
 				check <- true
 				fmt.Println("Goroutine is dead while context is stopped!")
 				return
@@ -45,7 +44,7 @@ func stopByChan() {
 			case <-tm:
 				fmt.Println("Closing goroutine")
 				done <- true // Посылаем данные в канал done
-				close(done)  // Закрываем канал done, следовательно закрываем нашу горутину
+				close(done)  // Закрываем канал done
 			case <-done:
 				fmt.Println("Goroutine is dead while channel is closed")
 				return
@@ -61,7 +60,7 @@ func stopByWaitGroup() {
 	wg.Add(1)
 	go func() {
 		for {
-			foo, ok := <-check
+			foo, ok := <-check // Тут реализация с получением данных из канала, когда получим данные, тогда выйдем из фукнции
 			if !ok {
 				fmt.Println("Goroutine is dead by WaitGroup")
 				wg.Done()
@@ -72,5 +71,5 @@ func stopByWaitGroup() {
 	}()
 	check <- true
 	close(check)
-	wg.Wait()
+	wg.Wait() // Ждем завершения всех горутин
 }

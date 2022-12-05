@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 
+// Реализовать бинарный поиск встроенными методами языка
 func main() {
 	arr := []int{1, 2, 3, 4, 5, 6, 7}
 	var searchNum int
@@ -17,11 +18,11 @@ func main() {
 // На вход должен идти отсортироанный слайс, возвращаем найденный индекс
 func BinarySearch(arr []int, item int) int {
 	if len(arr) > 0 {
-		low := 0
-		high := len(arr) - 1
+		low := 0             // Нижний диапазон индекса
+		high := len(arr) - 1 // Верхний диапазон индекса
 		for low <= high {
-			mid := (low + high) / 2
-			guess := arr[mid]
+			mid := (low + high) / 2 // Формула вычисления среднего индекса
+			guess := arr[mid]       // Если не находим число, то ищем дальше.
 			if guess == item {
 				return mid
 			}

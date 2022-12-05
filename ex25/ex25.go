@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Реализовать собственную функцию sleep.
 func main() {
 	sleepByTime(time.Second * 5)
 	sleepByContext(time.Second * 5)

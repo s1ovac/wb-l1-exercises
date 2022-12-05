@@ -41,6 +41,7 @@ func main() {
 	for i := 0; i < len(array); i++ {
 		<-ch
 	}
+
 }
 
 func powPrint(n int) {
